@@ -55,12 +55,12 @@ def load_data_from_db():
     conn = get_connection()
     if conn:
         try:
-            # IMPORTANT: Ensure 'vista_municipios_clima' exists in your DB
+            # ACTUALIZACIÓN: Nombre de la vista cambiado a 'vista_municipios_geo'
             query = "SELECT * FROM vista_municipios_geo" 
             df = pd.read_sql(query, conn)
             conn.close()
             
-            # Standardize column names to lowercase to avoid case-sensitivity issues
+            # Standardize column names to lowercase
             df.columns = [c.lower() for c in df.columns]
             return df
         except Exception as e:
@@ -73,20 +73,25 @@ df_municipios = load_data_from_db()
 
 # Fallback data if database is empty or connection fails
 if df_municipios.empty:
-    st.warning("No data detected in MySQL view. Using sample data.")
+    st.warning("No se detectaron datos en la vista 'vista_municipios_geo'. Usando datos de ejemplo.")
     df_municipios = pd.DataFrame({
         'municipio': ["Bogotá", "Medellín"], 
         'latitud': [4.6097, 6.2442], 
         'longitud': [-74.0817, -75.5812], 
         'temp_avg': [14.5, 22.0], 
-        'precip_anual': [850, 1500]
+        'valor_num': [850, 1500],
+        'brillo_solar': [5, 6]
     })
 
-# COLUMN SEARCH LOGIC (Flexible for 'latitud', 'lat', 'longitud', 'lon', etc.)
+# --- COLUMN SEARCH LOGIC ---
 lat_col = next((c for c in df_municipios.columns if c in ['latitud', 'lat', 'latitude']), None)
 lon_col = next((c for c in df_municipios.columns if c in ['longitud', 'lon', 'longitude']), None)
+mun_col = next((c for c in df_municipios.columns if c in ['municipio', 'nombre', 'city', 'town']), 'municipio')
+temp_col = next((c for c in df_municipios.columns if 'temp' in c), 'temp_avg')
+precip_col = next((c for c in df_municipios.columns if any(p in c for p in ['precip', 'lluvia', 'valor_num'])), 'precip_anual')
+brillo_col = next((c for c in df_municipios.columns if any(s in c for s in ['brillo', 'solar', 'sun'])), 'brillo_solar')
 
-# --- NAVIGATION LOGIC ---
+# --- NAVIGATION ---
 st.sidebar.title("📌 Navegación")
 page = st.sidebar.radio("Ir a:", ["Inicio", "Explorador Climático", "Análisis Agrícola"])
 
@@ -103,7 +108,7 @@ if page == "Inicio":
     with col1:
         st.markdown('<div class="feature-card"><h3>📊 Visualización</h3><p>Gráficos dinámicos de temperatura y precipitación diaria.</p></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown('<div class="feature-card"><h3>📍 Geolocalización</h3><p>Mapas interactivos con coordenadas de precisión (Railway).</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card"><h3>📍 Geolocalización</h3><p>Mapas interactivos con coordenadas de precisión de la vista Geo.</p></div>', unsafe_allow_html=True)
     with col3:
         st.markdown('<div class="feature-card"><h3>🌾 Agro-Inteligencia</h3><p>Recomendaciones de siembra basadas en históricos de lluvia.</p></div>', unsafe_allow_html=True)
 
@@ -111,31 +116,28 @@ if page == "Inicio":
     st.subheader("📍 Municipios en el Sistema")
     
     if lat_col and lon_col:
-        # We ensure the columns are named 'lat' and 'lon' only for the st.map function
         map_df = df_municipios[[lat_col, lon_col]].copy()
         map_df.columns = ['lat', 'lon']
         st.map(map_df)
     else:
-        st.error("No se encontraron columnas de coordenadas (latitud/longitud) en los datos.")
+        st.error("No se encontraron columnas de coordenadas en 'vista_municipios_geo'.")
 
 # --- PAGE 2: DASHBOARD ---
 elif page == "Explorador Climático":
     st.title("📊 Análisis Detallado")
     
-    if 'municipio' in df_municipios.columns:
-        municipio_sel = st.sidebar.selectbox("Seleccione el Municipio", df_municipios['municipio'].unique())
-        datos_mun = df_municipios[df_municipios['municipio'] == municipio_sel].iloc[0]
+    if mun_col in df_municipios.columns:
+        municipio_sel = st.sidebar.selectbox("Seleccione el Municipio", df_municipios[mun_col].unique())
+        datos_mun = df_municipios[df_municipios[mun_col] == municipio_sel].iloc[0]
 
         col_stats, col_map = st.columns([1, 1])
         
         with col_stats:
             st.write(f"### Indicadores: {municipio_sel}")
-            st.metric("Temperatura Promedio", f"{datos_mun.get('temp_avg', 0):.1f} °C")
-            st.metric("Precipitación Total", f"{datos_mun.get('precip_anual', 0):.1f} mm")
+            st.metric("Temperatura Promedio", f"{datos_mun.get(temp_col, 0):.1f} °C")
+            st.metric("Precipitación Total", f"{datos_mun.get(precip_col, 0):.1f} mm")
             
-            # Value Added: Estimated Thermal Sensation
-            # Using a simplified formula: Temp + (0.2 * solar_brightness)
-            sensacion = datos_mun.get('temp_avg', 0) + (0.2 * datos_mun.get('brillo_solar', 5))
+            sensacion = datos_mun.get(temp_col, 0) + (0.2 * datos_mun.get(brillo_col, 5))
             st.metric("Sensación Térmica Est.", f"{sensacion:.1f} °C")
 
         with col_map:
@@ -147,36 +149,38 @@ elif page == "Explorador Climático":
                 })
                 st.map(map_data, zoom=10)
     else:
-        st.error("La columna 'municipio' no fue encontrada en la base de datos.")
+        st.error(f"La columna de municipios no fue encontrada en la vista.")
 
 # --- PAGE 3: AGRICULTURAL ANALYSIS ---
 elif page == "Análisis Agrícola":
     st.title("🌾 Recomendaciones Técnicas de Siembra")
     
-    if 'municipio' in df_municipios.columns:
-        municipio_sel = st.selectbox("Analizar municipio para recomendación:", df_municipios['municipio'].unique())
-        datos_mun = df_municipios[df_municipios['municipio'] == municipio_sel].iloc[0]
+    if mun_col in df_municipios.columns:
+        municipio_sel = st.selectbox("Analizar municipio:", df_municipios[mun_col].unique())
+        datos_mun = df_municipios[df_municipios[mun_col] == municipio_sel].iloc[0]
         
         col_a, col_b = st.columns(2)
         
         with col_a:
             st.subheader("Idoneidad de Cultivo")
-            precip = datos_mun.get('precip_anual', 0)
+            precip = datos_mun.get(precip_col, 0)
             
             if precip > 1800:
-                st.success("✅ Recomendado: Arroz o Plátano (Requieren alta humedad)")
+                st.success("✅ Recomendado: Arroz o Plátano")
             elif 1000 <= precip <= 1800:
-                st.success("✅ Recomendado: Café o Maíz (Humedad moderada)")
+                st.success("✅ Recomendado: Café o Maíz")
             else:
-                st.info("ℹ️ Recomendado: Cultivos de secano o riego tecnificado")
+                st.info("ℹ️ Recomendado: Cultivos de secano")
                 
         with col_b:
-            fig = px.bar(df_municipios, x="municipio", y="precip_anual", 
+            fig = px.bar(df_municipios, 
+                         x=mun_col, 
+                         y=precip_col, 
                          title="Comparativa Regional de Lluvias",
-                         color="precip_anual", color_continuous_scale="Viridis")
+                         labels={mun_col: 'Municipio', precip_col: 'Precipitación (mm)'},
+                         color=precip_col, 
+                         color_continuous_scale="Viridis")
             st.plotly_chart(fig)
-    else:
-        st.error("No se pueden generar recomendaciones sin datos de municipios.")
 
 st.sidebar.markdown("---")
 st.sidebar.caption("Proyecto 2026 | Creado: Andres Martinez")
