@@ -56,7 +56,7 @@ def load_data_from_db():
     if conn:
         try:
             # IMPORTANT: Ensure 'vista_municipios_clima' exists in your DB
-            query = "SELECT * FROM vista_municipios_clima" 
+            query = "SELECT * FROM vista_municipios_geo" 
             df = pd.read_sql(query, conn)
             conn.close()
             
