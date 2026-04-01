@@ -56,7 +56,7 @@ def load_data_from_db():
     if conn:
         try:
             # Reemplaza 'nombre_de_tu_vista' por el nombre real de tu vista en MySQL
-            query = "SELECT * FROM vista_municipios_clima" 
+            query = "SELECT * FROM vista_municipios_geo" 
             df = pd.read_sql(query, conn)
             conn.close()
             return df
