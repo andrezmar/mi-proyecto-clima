@@ -83,13 +83,13 @@ if df_municipios.empty:
         'brillo_solar': [5, 6]
     })
 
-# --- COLUMN SEARCH LOGIC ---
+# --- COLUMN SEARCH LOGIC (Robust detection) ---
 lat_col = next((c for c in df_municipios.columns if c in ['latitud', 'lat', 'latitude']), None)
 lon_col = next((c for c in df_municipios.columns if c in ['longitud', 'lon', 'longitude']), None)
-mun_col = next((c for c in df_municipios.columns if c in ['municipio', 'nombre', 'city', 'town']), 'municipio')
-temp_col = next((c for c in df_municipios.columns if 'temp' in c), 'temp_avg')
-precip_col = next((c for c in df_municipios.columns if any(p in c for p in ['precip', 'lluvia', 'valor_num'])), 'precip_anual')
-brillo_col = next((c for c in df_municipios.columns if any(s in c for s in ['brillo', 'solar', 'sun'])), 'brillo_solar')
+mun_col = next((c for c in df_municipios.columns if c in ['municipio', 'nombre', 'city', 'town']), None)
+temp_col = next((c for c in df_municipios.columns if 'temp' in c), None)
+precip_col = next((c for c in df_municipios.columns if any(p in c for p in ['precip', 'lluvia', 'valor_num'])), None)
+brillo_col = next((c for c in df_municipios.columns if any(s in c for s in ['brillo', 'solar', 'sun'])), None)
 
 # --- NAVIGATION ---
 st.sidebar.title("📌 Navegación")
@@ -116,7 +116,7 @@ if page == "Inicio":
     st.subheader("📍 Municipios en el Sistema")
     
     if lat_col and lon_col:
-        map_df = df_municipios[[lat_col, lon_col]].copy()
+        map_df = df_municipios[[lat_col, lon_col]].dropna().copy()
         map_df.columns = ['lat', 'lon']
         st.map(map_df)
     else:
@@ -126,7 +126,7 @@ if page == "Inicio":
 elif page == "Explorador Climático":
     st.title("📊 Análisis Detallado")
     
-    if mun_col in df_municipios.columns:
+    if mun_col and mun_col in df_municipios.columns:
         municipio_sel = st.sidebar.selectbox("Seleccione el Municipio", df_municipios[mun_col].unique())
         datos_mun = df_municipios[df_municipios[mun_col] == municipio_sel].iloc[0]
 
@@ -134,10 +134,13 @@ elif page == "Explorador Climático":
         
         with col_stats:
             st.write(f"### Indicadores: {municipio_sel}")
-            st.metric("Temperatura Promedio", f"{datos_mun.get(temp_col, 0):.1f} °C")
-            st.metric("Precipitación Total", f"{datos_mun.get(precip_col, 0):.1f} mm")
+            st.metric("Temperatura Promedio", f"{datos_mun.get(temp_col, 0) if temp_col else 0:.1f} °C")
+            st.metric("Precipitación Total", f"{datos_mun.get(precip_col, 0) if precip_col else 0:.1f} mm")
             
-            sensacion = datos_mun.get(temp_col, 0) + (0.2 * datos_mun.get(brillo_col, 5))
+            # Sensación térmica calculada
+            val_temp = datos_mun.get(temp_col, 0) if temp_col else 0
+            val_brillo = datos_mun.get(brillo_col, 5) if brillo_col else 5
+            sensacion = val_temp + (0.2 * val_brillo)
             st.metric("Sensación Térmica Est.", f"{sensacion:.1f} °C")
 
         with col_map:
@@ -149,13 +152,13 @@ elif page == "Explorador Climático":
                 })
                 st.map(map_data, zoom=10)
     else:
-        st.error(f"La columna de municipios no fue encontrada en la vista.")
+        st.error(f"No se pudo identificar la columna de municipios.")
 
 # --- PAGE 3: AGRICULTURAL ANALYSIS ---
 elif page == "Análisis Agrícola":
     st.title("🌾 Recomendaciones Técnicas de Siembra")
     
-    if mun_col in df_municipios.columns:
+    if mun_col and mun_col in df_municipios.columns:
         municipio_sel = st.selectbox("Analizar municipio:", df_municipios[mun_col].unique())
         datos_mun = df_municipios[df_municipios[mun_col] == municipio_sel].iloc[0]
         
@@ -163,7 +166,7 @@ elif page == "Análisis Agrícola":
         
         with col_a:
             st.subheader("Idoneidad de Cultivo")
-            precip = datos_mun.get(precip_col, 0)
+            precip = datos_mun.get(precip_col, 0) if precip_col else 0
             
             if precip > 1800:
                 st.success("✅ Recomendado: Arroz o Plátano")
@@ -173,14 +176,26 @@ elif page == "Análisis Agrícola":
                 st.info("ℹ️ Recomendado: Cultivos de secano")
                 
         with col_b:
-            fig = px.bar(df_municipios, 
-                         x=mun_col, 
-                         y=precip_col, 
-                         title="Comparativa Regional de Lluvias",
-                         labels={mun_col: 'Municipio', precip_col: 'Precipitación (mm)'},
-                         color=precip_col, 
-                         color_continuous_scale="Viridis")
-            st.plotly_chart(fig)
+            if precip_col:
+                try:
+                    # Limpieza de datos antes de graficar
+                    df_plot = df_municipios[[mun_col, precip_col]].copy()
+                    df_plot[precip_col] = pd.to_numeric(df_plot[precip_col], errors='coerce').fillna(0)
+                    
+                    fig = px.bar(df_plot, 
+                                 x=mun_col, 
+                                 y=precip_col, 
+                                 title="Comparativa Regional de Lluvias",
+                                 labels={mun_col: 'Municipio', precip_col: 'Precipitación (mm)'},
+                                 color=precip_col, 
+                                 color_continuous_scale="Viridis")
+                    st.plotly_chart(fig)
+                except Exception as e:
+                    st.error(f"Error al generar el gráfico: {e}")
+            else:
+                st.warning("No hay datos de precipitación (valor_num) para graficar.")
+    else:
+        st.error("No se pueden generar recomendaciones sin datos de municipios.")
 
 st.sidebar.markdown("---")
 st.sidebar.caption("Proyecto 2026 | Creado: Andres Martinez")
