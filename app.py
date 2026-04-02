@@ -488,14 +488,14 @@ if pagina == "📊 Resumen general":
             marker_color=[COLORES_MUNICIPIOS.get(m, "#2d6a4f") for m in temp_muni['Municipio']],
             opacity=0.5
         )
-        fig_temp.update_layout(
-            **PLOTLY_LAYOUT,
-            barmode='group',
-            title=dict(text="°C promedio por municipio", font=dict(color="#6fa87e", size=13)),
-            yaxis_title="°C",
-            height=320,
-            legend=dict(orientation="h", y=1.1, bgcolor="rgba(0,0,0,0)", font=dict(color="#9cbfa8"))
-        )
+    #    fig_temp.update_layout(
+    #        **PLOTLY_LAYOUT,
+    #        barmode='group',
+    #        title=dict(text="°C promedio por municipio", font=dict(color="#6fa87e", size=13)),
+    #        yaxis_title="°C",
+    #        height=320,
+    #        legend=dict(orientation="h", y=1.1, bgcolor="rgba(0,0,0,0)", font=dict(color="#9cbfa8"))
+    #    )
         st.plotly_chart(fig_temp, use_container_width=True)
 
     col_a, col_b = st.columns(2)
