@@ -612,12 +612,16 @@ elif pagina == "🗺️ Mapa georreferenciado":
         if not df_map.empty and df_map['latitud'].notna().any():
             df_map = df_map.dropna(subset=['latitud', 'longitud'])
 
+            # Normalizar tamaño: scatter_mapbox requiere valores > 0
+            v_min = df_map['valor'].min()
+            df_map['tamaño'] = df_map['valor'] - v_min + 1
+
             fig_map = px.scatter_mapbox(
                 df_map,
                 lat="latitud", lon="longitud",
                 hover_name="Municipio",
                 color="valor",
-                size="valor",
+                size="tamaño",
                 size_max=40,
                 color_continuous_scale=escala,
                 zoom=6.5,
