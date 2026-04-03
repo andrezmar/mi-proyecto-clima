@@ -72,7 +72,7 @@ html, body, [class*="css"] {
 .hero-title {
     font-family: 'DM Serif Display', serif;
     font-size: 2.8rem;
-    color: #d4f0dc;
+    color: #FFFFFF;
     margin: 0 0 0.3rem 0;
     line-height: 1.1;
 }
