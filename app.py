@@ -397,8 +397,8 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown(
-        '<div style="font-size:0.7rem;color:#2d5c3e;text-align:center;">Proyecto 2026 · Andres Martinez</div>',
-        unsafe_allow_html=True
+    #    '<div style="font-size:0.7rem;color:#2d5c3e;text-align:center;">Proyecto 2026 · Andres Martinez</div>',
+    #    unsafe_allow_html=True
     )
 
 # ─────────────────────────────────────────────
