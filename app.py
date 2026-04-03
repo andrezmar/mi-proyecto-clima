@@ -341,8 +341,8 @@ def load_municipios():
 with st.sidebar:
     st.markdown("""
     <div style="padding: 1rem 0 1.5rem 0;">
-        <div style="font-family:'DM Serif Display',serif;font-size:3.3rem;color:#a8d5b5;">GeoClima</div>
-        <div style="font-size:1.7rem;color:#4a7c59;letter-spacing:0.15em;text-transform:uppercase;">Antioquia · Colombia</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:2.8rem;color:#a8d5b5;">GeoClima</div>
+        <div style="font-size:1.0rem;color:#4a7c59;letter-spacing:0.15em;text-transform:uppercase;">Antioquia · Colombia</div>
     </div>
     """, unsafe_allow_html=True)
     st.markdown('<style>div[role="radiogroup"] p {color: #FFFFFF !important; font-weight: 500;}</style>', unsafe_allow_html=True)
