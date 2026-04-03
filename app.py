@@ -107,7 +107,7 @@ html, body, [class*="css"] {
     font-size: 0.72rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #6fa87e;
+    color: #FFFFFF;
     margin-bottom: 0.5rem;
 }
 .metric-value {
