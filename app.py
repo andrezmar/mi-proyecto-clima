@@ -397,7 +397,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown(
-        '<div style="font-size:0.7rem;color:#2d5c3e;text-align:center;">Proyecto Análisis de datos Integrador</div>',
+        '<div style="font-size:0.8rem;color:#2d5c3e;text-align:center;">Análisis de datos Integrador</div>',
         unsafe_allow_html=True
     )
 
