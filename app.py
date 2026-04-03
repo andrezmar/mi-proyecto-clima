@@ -571,7 +571,7 @@ elif pagina == "🗺️ Mapa georreferenciado":
     with col_ctrl:
         variable_mapa = st.selectbox(
             "Variable a visualizar",
-            ["Temperatura máxima", "Temperatura mínima", "Precipitación acumulada", "Brillo solar"]
+            ["Brillo solar", "Precipitación acumulada", "Temperatura mínima", "Temperatura máxima"]
         )
         st.markdown("<div style='height:1rem'></div>", unsafe_allow_html=True)
         st.markdown("**Municipios disponibles**")
