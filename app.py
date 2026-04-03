@@ -899,7 +899,7 @@ elif pagina == "⚖️ Comparativo":
             ["Temperatura máxima", "Temperatura mínima", "Amplitud térmica",
              "Precipitación acumulada", "Brillo solar"]
         )
-        agrupar_comp = st.selectbox("Agrupar por", ["Año", "Mes", "Trimestre"])
+        agrupar_comp = st.selectbox("Agrupar por", ["Mes", "Trimestre", "Año"])
 
     with col_c2:
         meses_en_ord = list(MESES_ES.keys())
