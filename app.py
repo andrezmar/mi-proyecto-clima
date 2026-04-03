@@ -9,7 +9,7 @@ from plotly.subplots import make_subplots
 # CONFIGURACIÓN DE PÁGINA
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="GeoClima Antioquia",
+    page_title="GeoClima Municipios de Antioquia",
     page_icon="🌿",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -428,7 +428,7 @@ with st.spinner("Cargando datos climáticos..."):
 st.markdown(f"""
 <div class="hero">
     <p class="hero-subtitle">Dashboard climático · Antioquia, Colombia</p>
-    <h1 class="hero-title">GeoClima Antioquia</h1>
+    <h1 class="hero-title">GeoClima Municipios de Antioquia</h1>
     <div style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
         <span class="info-badge">📅 {rango_años[0]} – {rango_años[1]}</span>
         <span class="info-badge">🌡️ Temperatura diaria</span>
