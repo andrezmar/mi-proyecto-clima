@@ -345,7 +345,7 @@ with st.sidebar:
         <div style="font-size:0.7rem;color:#4a7c59;letter-spacing:0.15em;text-transform:uppercase;">Antioquia · Colombia</div>
     </div>
     """, unsafe_allow_html=True)
-
+    st.markdown('<style>div[role="radiogroup"] p {color: #FFFFFF !important; font-weight: 500;}</style>', unsafe_allow_html=True)
     st.markdown("**Navegación**")
     pagina = st.radio(
         "",
