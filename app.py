@@ -201,6 +201,12 @@ PLOTLY_LAYOUT = dict(
     colorway=["#52b788", "#40916c", "#74c99a", "#2d6a4f", "#95d5b2", "#1b4332"],
 )
 
+def apply_layout(fig, **kwargs):
+    """Aplica PLOTLY_LAYOUT + kwargs adicionales sin conflicto de claves duplicadas."""
+    merged = {**PLOTLY_LAYOUT, **kwargs}
+    fig.update_layout(**merged)
+    return fig
+
 COLORES_MUNICIPIOS = {
     "Alejandría": "#52b788",
     "Urrao":      "#40916c",
@@ -488,14 +494,14 @@ if pagina == "📊 Resumen general":
             marker_color=[COLORES_MUNICIPIOS.get(m, "#2d6a4f") for m in temp_muni['Municipio']],
             opacity=0.5
         )
-    #    fig_temp.update_layout(
-    #        **PLOTLY_LAYOUT,
-    #        barmode='group',
-    #        title=dict(text="°C promedio por municipio", font=dict(color="#6fa87e", size=13)),
-    #        yaxis_title="°C",
-    #        height=320,
-    #        legend=dict(orientation="h", y=1.1, bgcolor="rgba(0,0,0,0)", font=dict(color="#9cbfa8"))
-    #    )
+        apply_layout(
+            fig_temp,
+            barmode='group',
+            title=dict(text="°C promedio por municipio", font=dict(color="#6fa87e", size=13)),
+            yaxis_title="°C",
+            height=320,
+            legend=dict(orientation="h", y=1.1, bgcolor="rgba(0,0,0,0)", font=dict(color="#9cbfa8"))
+        )
         st.plotly_chart(fig_temp, use_container_width=True)
 
     col_a, col_b = st.columns(2)
@@ -515,8 +521,8 @@ if pagina == "📊 Resumen general":
                 fillcolor="rgba(82,183,136,0.15)",
                 line=dict(color="#52b788", width=2)
             )
-            fig_p.update_layout(
-                **PLOTLY_LAYOUT,
+            apply_layout(
+                fig_p,
                 title=dict(text="mm totales anuales (todos los municipios)", font=dict(color="#6fa87e", size=12)),
                 yaxis_title="mm",
                 xaxis_title="",
@@ -543,8 +549,8 @@ if pagina == "📊 Resumen general":
                 color='brillo_horas',
                 color_continuous_scale=["#1b4332", "#52b788", "#d8f3dc"]
             )
-            fig_b.update_layout(
-                **PLOTLY_LAYOUT,
+            apply_layout(
+                fig_b,
                 title=dict(text="Promedio de horas de sol por mes", font=dict(color="#6fa87e", size=12)),
                 yaxis_title="horas/sol",
                 xaxis_title="",
@@ -689,8 +695,8 @@ elif pagina == "📈 Tendencias temporales":
                     title="Temperatura máxima promedio"
                 )
                 fig_tmax.update_traces(line=dict(width=2))
-                fig_tmax.update_layout(**PLOTLY_LAYOUT, height=320, yaxis_title="°C",
-                                       title=dict(text="Temperatura máxima prom.", font=dict(color="#6fa87e", size=13)))
+                apply_layout(fig_tmax, height=320, yaxis_title="°C",
+                             title=dict(text="Temperatura máxima prom.", font=dict(color="#6fa87e", size=13)))
                 st.plotly_chart(fig_tmax, use_container_width=True)
 
             with col_tmin:
@@ -699,8 +705,8 @@ elif pagina == "📈 Tendencias temporales":
                     color_discrete_map=COLORES_MUNICIPIOS,
                 )
                 fig_tmin.update_traces(line=dict(width=2))
-                fig_tmin.update_layout(**PLOTLY_LAYOUT, height=320, yaxis_title="°C",
-                                       title=dict(text="Temperatura mínima prom.", font=dict(color="#6fa87e", size=13)))
+                apply_layout(fig_tmin, height=320, yaxis_title="°C",
+                             title=dict(text="Temperatura mínima prom.", font=dict(color="#6fa87e", size=13)))
                 st.plotly_chart(fig_tmin, use_container_width=True)
 
             # Rango diario como ribbon
@@ -715,8 +721,8 @@ elif pagina == "📈 Tendencias temporales":
                 barmode='group',
                 color_discrete_map=COLORES_MUNICIPIOS
             )
-            fig_rango.update_layout(**PLOTLY_LAYOUT, height=260, yaxis_title="Rango °C",
-                                    title=dict(text="Amplitud térmica diaria promedio", font=dict(color="#6fa87e", size=13)))
+            apply_layout(fig_rango, height=260, yaxis_title="Rango °C",
+                         title=dict(text="Amplitud térmica diaria promedio", font=dict(color="#6fa87e", size=13)))
             st.plotly_chart(fig_rango, use_container_width=True)
         else:
             st.info("No hay datos de temperatura para los filtros seleccionados.")
@@ -760,8 +766,8 @@ elif pagina == "📈 Tendencias temporales":
                     barmode='group',
                     color_discrete_map=COLORES_MUNICIPIOS
                 )
-                fig_p.update_layout(
-                    **PLOTLY_LAYOUT, height=350, yaxis_title=y_label,
+                apply_layout(
+                    fig_p,
                     title=dict(text=f"Precipitación por {agrup_p.lower()}", font=dict(color="#6fa87e", size=13))
                 )
                 st.plotly_chart(fig_p, use_container_width=True)
@@ -780,8 +786,8 @@ elif pagina == "📈 Tendencias temporales":
                 df_precip_box, x='mes_es', y='precipitacion_mm',
                 color_discrete_sequence=["#52b788"]
             )
-            fig_box.update_layout(
-                **PLOTLY_LAYOUT, height=280, yaxis_title="mm",
+            apply_layout(
+                fig_box,
                 title=dict(text="Variabilidad mensual (todos los municipios y años)", font=dict(color="#6fa87e", size=13)),
                 showlegend=False
             )
@@ -822,8 +828,8 @@ elif pagina == "📈 Tendencias temporales":
                 color_discrete_map=COLORES_MUNICIPIOS
             )
             fig_bri.update_traces(line=dict(width=2), marker=dict(size=5))
-            fig_bri.update_layout(
-                **PLOTLY_LAYOUT, height=360, yaxis_title="horas/sol",
+            apply_layout(
+                fig_bri,
                 title=dict(text=f"Brillo solar promedio por {agrup_b.lower()}", font=dict(color="#6fa87e", size=13))
             )
             st.plotly_chart(fig_bri, use_container_width=True)
@@ -851,8 +857,8 @@ elif pagina == "📈 Tendencias temporales":
                     color_continuous_scale=["#1b4332", "#40916c", "#74c99a", "#d8f3dc"],
                     aspect="auto"
                 )
-                fig_hm.update_layout(
-                    **PLOTLY_LAYOUT, height=320,
+                apply_layout(
+                    fig_hm,
                     title=dict(text=f"Horas de sol · {muni_hm}", font=dict(color="#6fa87e", size=13)),
                     xaxis_title="Año", yaxis_title="",
                     coloraxis_colorbar=dict(
@@ -955,8 +961,8 @@ elif pagina == "⚖️ Comparativo":
                 color_discrete_map=COLORES_MUNICIPIOS
             )
             fig_comp.update_traces(line=dict(width=2.5), marker=dict(size=6))
-            fig_comp.update_layout(
-                **PLOTLY_LAYOUT, height=380, yaxis_title=y_lbl,
+            apply_layout(
+                fig_comp,
                 xaxis_title=agrupar_comp,
                 title=dict(text=f"{var_comp} · comparativo por {agrupar_comp.lower()}", font=dict(color="#6fa87e", size=13))
             )
