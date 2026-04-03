@@ -113,7 +113,7 @@ html, body, [class*="css"] {
 .metric-value {
     font-family: 'DM Serif Display', serif;
     font-size: 2rem;
-    color: #d4f0dc;
+    color: #FFFFFF;
     line-height: 1;
 }
 .metric-unit {
