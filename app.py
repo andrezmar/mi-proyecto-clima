@@ -43,7 +43,7 @@ html, body, [class*="css"] {
 [data-testid="stSidebar"] .stSelectbox label,
 [data-testid="stSidebar"] .stMultiSelect label,
 [data-testid="stSidebar"] .stRadio label {
-    color: #9cbfa8 !important;
+    color: #FFFFFF !important;
     font-size: 0.78rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
