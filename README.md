@@ -1,6 +1,6 @@
 ![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=Streamlit&logoColor=white)
 
-# 🌱 Agro-Clima Intelligence Pro
+# 🌱 Clima Intelligence Pro
 
 ### 🔗 Acceso Directo a la Aplicación
 Puedes interactuar con la plataforma aquí:
