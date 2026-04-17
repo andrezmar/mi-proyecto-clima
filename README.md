@@ -4,7 +4,7 @@
 
 ### 🔗 Acceso Directo a la Aplicación
 Puedes interactuar con la plataforma aquí:
-👉 **[https://app-mi-proyecto-clima.streamlit.app/](https://app-mi-proyecto-clima.streamlit.app/)**
+👉 **[https://app-mi-proyecto-clima.streamlit.app/](https://mi-proyecto-clima.streamlit.app/)**
 
 ---
 
